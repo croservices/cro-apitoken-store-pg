@@ -1,0 +1,38 @@
+use Cro::APIToken::Store::Pg;
+use DB::Pg;
+use Test;
+
+if %*ENV<DB_TESTING> {
+    my $store = Cro::APIToken::Store::Pg.new(handle => DB::Pg.new);
+    my $manager = Cro::APIToken::Manager.new(:$store);
+
+    $store.create-token("token-value1", DateTime.now.later(minutes => 30), {});
+    $store.create-token("token-value2", DateTime.now.later(minutes => 30), { :42user-id });
+    $store.create-token("token-value5", DateTime.now.later(minutes => 30), { :42user-id, :surname<Foo> });
+    my $resolved-t1 = $store.resolve-token($manager, "token-value1");
+    ok $resolved-t1, 'Token with no metadata is alive';
+    my $resolved-t2 = $store.resolve-token($manager, "token-value2");
+    ok $resolved-t2, 'Token with metadata is alive';
+    my $resolved-t3 = $store.resolve-token($manager, "token-value5");
+    ok $resolved-t3, 'Token 2 with metadata is alive';
+
+    my $not-resolved = $store.resolve-token($manager, "token-value3");
+    nok $not-resolved.defined, 'Unknown token value results in a type object';
+
+    is $store.find-tokens($manager, metadata => {}, :!expired, :!revoked).elems, 3, 'Found all valid records';
+    is $store.find-tokens($manager, metadata => { :42user-id }, :!expired, :!revoked).elems, 2,
+            'Found all valid tokens with metadata considered (1)';
+    is $store.find-tokens($manager, metadata => { :42user-id, :surname<Foo> }, :!expired, :!revoked).elems, 1,
+            'Found all valid tokens with metadata considered (2)';
+    is $store.find-tokens($manager, metadata => { :surname<Foo> }, :!expired, :!revoked).elems, 1,
+            'Found all valid tokens with metadata considered (3)';
+
+    $resolved-t3.revoke;
+
+    is $store.find-tokens($manager, metadata => { :surname<Foo> }, :!expired, :!revoked).elems, 0,
+            'Revoked are not found when forbidden';
+    is $store.find-tokens($manager, metadata => { :surname<Foo> }, :!expired, :revoked).elems, 1,
+            'Revoked is found when allowed';
+}
+
+done-testing;

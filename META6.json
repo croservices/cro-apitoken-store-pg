@@ -1,0 +1,22 @@
+{
+  "name": "Cro::APIToken::Store::Pg",
+  "description": "A Postgres storage backend for Cro::APIToken",
+  "version": "0.1",
+  "perl": "6.c",
+  "authors": [
+    "Write me!"
+  ],
+  "auth": "Write me!",
+  "depends": [
+    "DB::Pg",
+    "JSON::Fast"
+  ],
+  "build-depends": [],
+  "test-depends": [],
+  "provides": {
+    "Cro::APIToken::Store::Pg": "lib/Cro/APIToken/Store/Pg.pm6"
+  },
+  "resources": [],
+  "license": "Artistic-2.0",
+  "source-url": "нttps://github.com/croservices/cro-apitoken-store-pg.git"
+}
