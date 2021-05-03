@@ -44,7 +44,7 @@ class Cro::APIToken::Store::Pg does Cro::APIToken::Store {
     method !check-db-table-presence() {
         my $table-exists = $!handle.query("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'croapitokenstorepg');").value;
         if !$table-exists && $!create-table {
-            $!handle.execute('CREATE TEMPORARY table CroAPITokenStorePg (id serial NOT NULL PRIMARY KEY, token text NOT NULL, expiration timestamp NOT NULL, metadata json, revoked boolean);');
+            $!handle.execute('CREATE table CroAPITokenStorePg (id serial NOT NULL PRIMARY KEY, token text NOT NULL, expiration timestamp NOT NULL, metadata json, revoked boolean);');
             return True;
         }
         $table-exists;
