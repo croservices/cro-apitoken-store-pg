@@ -8,6 +8,7 @@
   ],
   "auth": "Write me!",
   "depends": [
+    "Cro::APIToken",
     "DB::Pg",
     "JSON::Fast"
   ],

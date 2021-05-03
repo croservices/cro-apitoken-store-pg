@@ -3,7 +3,15 @@ use DB::Pg;
 use Test;
 
 if %*ENV<DB_TESTING> {
-    my $store = Cro::APIToken::Store::Pg.new(handle => DB::Pg.new);
+    constant DB_TABLE_NAME = 'cro_apitoken_store_pg_test_table';
+    my $handle = DB::Pg.new();
+    if $handle.query("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{DB_TABLE_NAME}');").value {
+        $handle.execute('DELETE FROM ' ~ DB_TABLE_NAME ~ ';');
+    }
+    my $store = Cro::APIToken::Store::Pg.new(:$handle, table-name => DB_TABLE_NAME);
+    throws-like {
+        Cro::APIToken::Store::Pg.new(:$handle, table-name => 'table_name_for_cro_apitoken_does_not_exist', :!create-table);
+    }, X::Cro::APIToken::Store::Pg::NoTable, 'Dies if there is no table and ordered not to create one';
     my $manager = Cro::APIToken::Manager.new(:$store);
 
     $store.create-token("token-value1", DateTime.now.later(minutes => 30), {});
