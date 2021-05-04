@@ -24,5 +24,14 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Cro::APIToken" type="perl6">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="raku://1165981605:Cro::APIToken!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>
