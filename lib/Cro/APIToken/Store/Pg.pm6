@@ -45,7 +45,7 @@ class Cro::APIToken::Store::Pg does Cro::APIToken::Store {
                        Bool :$expired = False, Bool :$revoked = True --> Seq) {
         my $ordered-keys = %metadata.keys.cache;
         for @$ordered-keys -> $key {
-            die X::Cro::APIToken::Store::Pg::DangerousKey.new(:$key) unless $key ~~ /<:L+[_-]>/;
+            die X::Cro::APIToken::Store::Pg::DangerousKey.new(:$key) unless $key ~~ /^<:L+[_-]>$/;
         }
         my $metadata-format = $ordered-keys.kv.map(-> $k, $v { "(metadata->>'$v') = \${ $k + 1 }" }).join(' AND ');
         $metadata-format = 'AND ' ~ $metadata-format if $metadata-format;
